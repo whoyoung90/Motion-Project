@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     /* Basic Options */
-    "target": "es6", // 어떤 버전으로 컴파일할지 설정
-    "module": "ES2015", // 컴파일 될때 모듈을 어떻게 구현할 것인지 결정 => 노드환경: commonjs, 브라우저환경: ES
+    "target": "es6", // 타입스크립트 코드가 자바스크립트로 실제로 컴파일되는 버전
+    "module": "ES2015", // 자바스크립트로 컴파일된 코드가 사용할 모듈의 타입 => 노드환경: commonjs, 브라우저환경: ES
     "outDir": "./dist", // 컴파일된 js파일들의 저장 위치 지정
     "rootDir": "./src", // src 디렉토리 밖에서는 절대 typescript파일을 생성할 수 없도록
     "removeComments": true, // 배포용으로 만드는 컴파일된 js파일에 comment를 제거해서 최대한 파일 사이즈를 작게 설정
