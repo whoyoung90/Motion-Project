@@ -71,7 +71,7 @@ body {
   padding: 1em 3em;
   text-align: center;
   user-select: none; /* 사용자가 텍스트 위에서 드래깅을 할 수 없도록 */
-  text-transform: uppercase;
+  text-transform: uppercase; /* 대문자 변경 */
   font-size: 0.8rem;
   font-weight: 600;
   color: white;
@@ -84,18 +84,18 @@ body {
   height: 100%;
   overflow-y: auto;
   background-color: var(--document-bg-color);
-  /* Firefox */
+  /* 스크롤바 커스터마이징 Firefox */
   scrollbar-width: 6px;
   scrollbar-color: var(--bg-accent-color);
   scrollbar-face-color: var(--accent-color);
 }
 .document::-webkit-scrollbar {
-  /* Safari and Chrome */
+  /* 스크롤바 커스터마이징 Safari and Chrome */
   background-color: var(--bg-accent-color);
   width: 6px;
 }
 .document::-webkit-scrollbar-thumb {
-  /* Safari and Chrome */
+  /* 스크롤바 커스터마이징 Safari and Chrome */
   background-color: var(--accent-color);
 }
 
