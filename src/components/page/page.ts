@@ -1,5 +1,6 @@
 export class PageComponent {
   private element: HTMLUListElement; // 카드들의 목록을 담으므로 ul
+
   constructor() {
     this.element = document.createElement("ul");
     this.element.setAttribute("class", "page");
