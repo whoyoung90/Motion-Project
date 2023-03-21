@@ -2,9 +2,9 @@ import { BaseComponent } from "./../../component.js";
 export class ImageComponent extends BaseComponent<HTMLElement> {
   constructor(title: string, url: string) {
     super(`<section class="image">
-    <div class="image__holder"><img class="image__thumbnail"></div>
-    <p class="image__title"></p>
-  </section>`);
+            <div class="image__holder"><img class="image__thumbnail"></div>
+            <h2 class="image__title"></h2>
+          </section>`);
 
     const imageElement = this.element.querySelector(
       ".image__thumbnail"
@@ -46,6 +46,7 @@ export class ImageComponent extends BaseComponent<HTMLElement> {
 //     titleElement.textContent = title;
 //   }
 
+//   // position에 아무것도 전달하지 않으면 "afterbegin"이 기본값 (Default parameter)
 //   attachTo(parent: HTMLElement, position: InsertPosition = "afterbegin") {
 //     parent.insertAdjacentElement(position, this.element);
 //   }

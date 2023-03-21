@@ -1,4 +1,8 @@
-// interface를 규격화하여 => 사용하는 곳에서는 Component타입만 사용하도록!
+/**
+ * attachTo 함수를 인터페이스로 규격해둠으로써
+ * 추후에 BaseComponent가 아니라, 다른 FlexibleComponent 등등 어딘가에
+ * attchTo 함수를 구현하는 다른 종류의 클래스를 만들 수 있다!
+ */
 export interface Component {
   attachTo(parent: HTMLElement, position?: InsertPosition): void;
 }
@@ -17,7 +21,6 @@ export class BaseComponent<T extends HTMLElement> implements Component {
   }
 
   // 전달받은 parent(=appRoot) 요소에 우리가 만든 DOM 요소를 붙여주는 함수
-  // position에 아무것도 전달하지 않으면 "afterbegin"이 기본값 (Default parameter)
   attachTo(parent: HTMLElement, position: InsertPosition = "afterbegin") {
     parent.insertAdjacentElement(position, this.element);
   }
