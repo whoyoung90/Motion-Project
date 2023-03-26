@@ -17,3 +17,6 @@ export class NoteComponent extends BaseComponent<HTMLElement> {
     bodyElement.textContent = body;
   }
 }
+
+// HTMLHeadElement: HTML의 head 태그를 대표하는 요소
+// HTMLHeadingElement: h1과 같은 heading 태그를 대표하는 요소
