@@ -17,7 +17,7 @@ export class BaseComponent<T extends HTMLElement> implements Component {
   constructor(htmlString: string) {
     const template = document.createElement("template");
     template.innerHTML = htmlString;
-    this.element = template.content.firstElementChild! as T;
+    this.element = template.content.firstElementChild! as T; // type assertion (null이 아닌 Element다)
   }
 
   // 전달받은 parent(=appRoot) 요소에 우리가 만든 DOM 요소를 붙여주는 함수

@@ -30,7 +30,7 @@ export class VideoComponent extends BaseComponent<HTMLElement> {
   private convertToEmbeddedURL(url: string): string {
     const regExp =
       /^(?:https?:\/\/)?(?:www\.)?(?:(?:youtube.com\/(?:(?:watch\?v=)|(?:embed\/))([a-zA-Z0-9-]{11}))|(?:youtu.be\/([a-zA-Z0-9-]{11})))/;
-    const match = url.match(regExp); // 매칭된 것을 array로 전달
+    const match = url.match(regExp); // 매칭된 것을 array 리턴
 
     const videoId = match ? match[1] || match[2] : undefined;
     if (videoId) {
