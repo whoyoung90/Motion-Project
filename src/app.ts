@@ -8,8 +8,10 @@ import { TodoComponent } from "./components/page/item/todo.js";
 // 웹팩과 같은 번들러를 쓰면 파일 확장자명을 생략할 수 있어요:)
 // 현재 우리 프로젝트는 별도의 번들러를 사용하지 않고, 브라우저에서 동작하는 ES6 모듈을 사용하기 때문에 .js를 붙여줘야 한다
 // 타입스크립트는 js로 컴파일시 import하는 경로는 변경하지 않아요
+
 class App {
-  private readonly page: Component & Composable;
+  // private readonly page: PageComponent;
+  private readonly page: Component & Composable; // intersection &
 
   // appRoot는 곧 document.querySelector(".document")
   constructor(appRoot: HTMLElement) {
@@ -41,3 +43,20 @@ class App {
 }
 
 new App(document.querySelector(".document")! as HTMLElement); // type assertion
+
+/**
+ * @description
+ * private readonly page: PageComponent -> Component & Composable 변경 이유?
+ *
+ * 현재 코드에서는 충분히 PageComponent라고 사용해도 괜찮아요.
+ * 하지만 미래의 확장성을 생각해 보았을때
+ * 타입을 PageComponent라고 한다면, 항상 page는 PageComponent여야 합니다.
+ * 우리의 문서는 딱 하나의 PageComponent만 페이지로 가지고 있을 수 있겠죠?
+ *
+ * 그런데 Component & Composable 컴포넌트 이면서 또 다른 자식 요소를 추가 할 수 있는
+ * Composable 인터페이스를 구현한 어떤 타입! 이라고 명시 해두면
+ *
+ * 나중에 그것을 구현 & 상속하는
+ * FancyPageComponent, DarkPageComponent, LightThemePageComponent 등
+ * 다양한 페이지 컴포넌트를 할당할 수 있기 때문!
+ */
