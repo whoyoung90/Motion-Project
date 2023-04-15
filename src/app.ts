@@ -1,5 +1,9 @@
 import { Component } from "./components/component.js";
-import { Composable, PageComponent } from "./components/page/page.js";
+import {
+  Composable,
+  PageComponent,
+  PageItemComponent,
+} from "./components/page/page.js";
 import { ImageComponent } from "./components/page/item/image.js";
 import { VideoComponent } from "./components/page/item/video.js";
 import { NoteComponent } from "./components/page/item/note.js";
@@ -11,18 +15,18 @@ import { TodoComponent } from "./components/page/item/todo.js";
 
 class App {
   // private readonly page: PageComponent;
-  private readonly page: Component & Composable; // intersection &
+  private readonly page: Component & Composable; // 나중에 PageComponent를 외부에서 받아올 수 있으므로
 
   // appRoot는 곧 document.querySelector(".document")
   constructor(appRoot: HTMLElement) {
-    this.page = new PageComponent();
-    this.page.attachTo(appRoot); // appRoot에 만들어진 page를 붙여준다! + Default parameter
+    this.page = new PageComponent(PageItemComponent);
+    this.page.attachTo(appRoot); // appRoot에 page element를 붙여준다!
 
     const image = new ImageComponent(
       "Image Title",
       "https://picsum.photos/600/300"
     );
-    // image.attachTo(appRoot, "beforeend");
+    // image.attachTo(appRoot, "beforeend"); // appRoot에 image element를 붙여준다!
     this.page.addChild(image);
 
     const video = new VideoComponent(

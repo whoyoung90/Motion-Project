@@ -32,7 +32,7 @@ export class ImageComponent extends BaseComponent<HTMLElement> {
 //     <p class="image__title"></p>
 //   </section>`;
 
-//     this.element = template.content.firstElementChild! as HTMLElement; // firstElementChild는 Line 28~31
+//     this.element = template.content.firstElementChild! as HTMLElement; // firstElementChild는 Line 30~33
 
 //     const imageElement = this.element.querySelector(
 //       ".image__thumbnail"
