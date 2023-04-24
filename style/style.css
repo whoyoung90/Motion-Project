@@ -16,23 +16,42 @@
   --black: #000000;
   --translucent-black: #00000099;
 }
-* {
-  outline: 0;
-  box-sizing: border-box;
-}
+
 li {
   list-style: none;
   padding-left: 0;
 }
+
 p {
   color: var(--smokywhite);
 }
+
 label {
   color: var(--text-accent-color);
 }
+
 dialog {
   border: 0;
 }
+
+button {
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+input,
+textarea {
+  background-color: var(--text-edit-bg-color);
+  color: var(--smokywhite);
+  font-size: 1.5em;
+}
+
+* {
+  outline: 0;
+  box-sizing: border-box;
+}
+
 body {
   background: url("../assets/background.png") center/cover no-repeat;
   font-family: Roboto, Oxygen, sans-serif;
@@ -45,17 +64,17 @@ body {
 }
 
 .app {
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 1000px; /* 너비가 1000px 이상 넘어가면 더이상 100%가 되지 않도록! */
-  height: 100%;
 }
 
 .banner {
-  text-align: center;
   background: var(--bg-main-color);
   border-bottom: 1px solid var(--bg-accent-color);
+  text-align: center;
 }
 
 .banner__title {
@@ -69,43 +88,45 @@ body {
   justify-content: center;
 }
 
-.create-button {
+.create-button,
+.dialog__submit {
   margin: 0.1em 0.2em;
-  padding: 1em 3em;
   text-align: center;
-  user-select: none; /* 사용자가 텍스트 위에서 드래깅을 할 수 없도록 */
-  text-transform: uppercase; /* 대문자 변경 */
-  font-size: 0.8rem;
+  user-select: none;
+  padding: 1em 3em;
+  text-transform: uppercase;
   font-weight: 600;
+  font-size: 0.8rem;
   color: white;
   background-color: var(--accent-color);
   border-color: var(--accent-color);
   border-radius: 2px;
 }
-
 .document {
   height: 100%;
   overflow-y: auto;
   background-color: var(--document-bg-color);
-  /* 스크롤바 커스터마이징 Firefox */
+  /* Firefox */
   scrollbar-width: 6px;
   scrollbar-color: var(--bg-accent-color);
   scrollbar-face-color: var(--accent-color);
 }
+
 .document::-webkit-scrollbar {
-  /* 스크롤바 커스터마이징 Safari and Chrome */
+  /* Safari and Chrome */
   background-color: var(--bg-accent-color);
   width: 6px;
 }
+
 .document::-webkit-scrollbar-thumb {
-  /* 스크롤바 커스터마이징 Safari and Chrome */
+  /* Safari and Chrome */
   background-color: var(--accent-color);
 }
 
 .footer {
-  text-align: center;
   background: var(--bg-main-color);
   border-top: 1px solid var(--border-color);
+  text-align: center;
 }
 
 /* -- Dialog -- */
@@ -135,4 +156,100 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   box-shadow: 2px 2px 20px var(--shadow-color);
+}
+
+.form__container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1em;
+}
+
+.close {
+  align-self: flex-end;
+  padding: 0.2rem;
+  color: var(--accent-color);
+  font-size: 28px;
+  font-weight: bold;
+  margin: 3px;
+  transition: color 250ms ease;
+}
+
+.close:hover,
+.close:focus {
+  transform: scale(1.5);
+  color: var(--shadow-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dialog__submit {
+  align-self: flex-end;
+  padding: 0.5em 1.5em;
+}
+
+/* -- PAGE ITEM -- */
+.page-item {
+  margin: 1.5em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 2px 2px 6px var(--shadow-color);
+  background: var(--component-bg-gradient);
+}
+
+.page-item__controls {
+  padding-right: 0.5em;
+}
+
+.page-item__title {
+  color: var(--text-accent-color);
+}
+
+.page-item__body {
+  width: 100%;
+}
+
+/* -- Image & Video -- */
+.video,
+.image {
+  display: flex;
+  width: 100%;
+  height: 250px;
+}
+
+.video__player,
+.image__holder {
+  flex: 60% 1 1;
+}
+
+.video__title,
+.image__title {
+  flex: 40% 1 1;
+  margin-left: 0.5em;
+}
+
+.video__iframe {
+  border: none;
+  width: 100%;
+  height: 100%;
+}
+
+.image__thumbnail {
+  width: 100%;
+  height: 100%;
+}
+
+/* -- Note -- */
+.note {
+  padding: 0.5em;
+}
+/* -- TODO -- */
+.todo {
+  padding: 0.5em;
+}
+
+.todo__list,
+.todo-label {
+  padding: 1em;
+  color: var(--smokywhite);
 }

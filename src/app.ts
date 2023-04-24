@@ -8,21 +8,28 @@ import { ImageComponent } from "./components/page/item/image.js";
 import { VideoComponent } from "./components/page/item/video.js";
 import { NoteComponent } from "./components/page/item/note.js";
 import { TodoComponent } from "./components/page/item/todo.js";
-import { InputDialog } from "./components/dialog/dialog.js";
+import {
+  InputDialog,
+  MediaData,
+  TextData,
+} from "./components/dialog/dialog.js";
 import { MediaSectionInput } from "./components/dialog/input/media-input.js";
 import { TextSectionInput } from "./components/dialog/input/text-input.js";
-
 // 확장자가 page.ts가 아닌 page.js인 이유?
-// 웹팩과 같은 번들러를 쓰면 파일 확장자명을 생략할 수 있어요:)
-// 현재 우리 프로젝트는 별도의 번들러를 사용하지 않고, 브라우저에서 동작하는 ES6 모듈을 사용하기 때문에 .js를 붙여줘야 한다
-// 타입스크립트는 js로 컴파일시 import하는 경로는 변경하지 않아요
+// 웹팩과 같은 번들러를 쓰면 파일 확장자명을 생략할 수 있지만
+// 현재 별도의 번들러를 사용하지 않고, 브라우저에서 동작하는 ES6 모듈을 사용하기 때문에 .js를 붙여줘야 한다
+
+// type InputComponentConstructor<T = MediaSectionInput | TextSectionInput> = {
+type InputComponentConstructor<T = (MediaData | TextData) & Component> = {
+  new (): T; // new라는 아무것도 전달받지 않는 생성자를 T타입으로
+};
 
 class App {
   // private readonly page: PageComponent;
   private readonly page: Component & Composable; // 나중에 PageComponent를 외부에서 받아올 수 있으므로
 
-  // appRoot는 곧 document.querySelector(".document")
-  constructor(appRoot: HTMLElement, dialogRoot: HTMLElement) {
+  // appRoot: document.querySelector(".document"), dialogRoot: document.body
+  constructor(appRoot: HTMLElement, private dialogRoot: HTMLElement) {
     this.page = new PageComponent(PageItemComponent); // PageItemComponent는 SectionContainerConstructor 타입!
     this.page.attachTo(appRoot); // appRoot에 page element를 붙여준다!
 
@@ -30,93 +37,84 @@ class App {
     //   "Image Title",
     //   "https://picsum.photos/600/300"
     // );
-    // // image.attachTo(appRoot, "beforeend"); // appRoot에 image element를 붙여준다!
     // this.page.addChild(image);
 
     // const video = new VideoComponent(
     //   "Video Title",
     //   "https://youtu.be/K3-jG52XwuQ"
     // );
-    // // video.attachTo(appRoot, "beforeend");
     // this.page.addChild(video);
 
     // const note = new NoteComponent("Note Title", "Note Body");
-    // // note.attachTo(appRoot, "beforeend");
     // this.page.addChild(note);
 
     // const todo = new TodoComponent("Todo Title", "Todo Item");
-    // // todo.attachTo(appRoot, "beforeend");
     // this.page.addChild(todo);
 
-    const imageBtn = document.querySelector("#new-image")! as HTMLButtonElement;
-    imageBtn.addEventListener("click", () => {
-      const dialog = new InputDialog();
-      const inputSection = new MediaSectionInput();
+    this.bindElementToDialog<MediaSectionInput>(
+      "#new-image",
+      MediaSectionInput,
+      (input: MediaSectionInput) => new ImageComponent(input.title, input.url)
+    );
+    // const imageBtn = document.querySelector("#new-image")! as HTMLButtonElement;
+    // imageBtn.addEventListener("click", () => {
+    //   const dialog = new InputDialog();
+    //   const inputSection = new MediaSectionInput();
 
-      dialog.addChild(inputSection); // #dialog__body에 MediaSectionInput을 붙여주고 ✨
-      dialog.attachTo(dialogRoot); // document.body에 #dialog__body를 붙인다! ✨
+    //   dialog.addChild(inputSection); // #dialog__body에 MediaSectionInput을 붙여주고 ✨
+    //   dialog.attachTo(dialogRoot); // document.body에 #dialog__body를 붙인다! ✨
+
+    //   dialog.setOnCloseListener(() => {
+    //     dialog.removeFrom(dialogRoot);
+    //   });
+    //   dialog.setOnSubmitListener(() => {
+    //     const image = new ImageComponent(inputSection.title, inputSection.url);
+    //     this.page.addChild(image);
+    //     dialog.removeFrom(dialogRoot);
+    //   });
+    // });
+
+    this.bindElementToDialog<MediaSectionInput>(
+      "#new-video",
+      MediaSectionInput,
+      (input: MediaSectionInput) => new VideoComponent(input.title, input.url)
+    );
+
+    this.bindElementToDialog<TextSectionInput>(
+      "#new-note",
+      TextSectionInput,
+      (input: TextSectionInput) => new NoteComponent(input.title, input.body)
+    );
+
+    this.bindElementToDialog<TextSectionInput>(
+      "#new-todo",
+      TextSectionInput,
+      (input: TextSectionInput) => new TodoComponent(input.title, input.body)
+    );
+  }
+
+  /* MediaSectionInput | TextSectionInput 뿐만아니라 나중에 다른 Input 타입도 만들 수 있기 때문에 */
+  // private bindElementToDialog<T extends MediaSectionInput | TextSectionInput>(
+  private bindElementToDialog<T extends (MediaData | TextData) & Component>(
+    selector: string,
+    InputComponent: InputComponentConstructor<T>,
+    makeSection: (input: T) => Component
+  ) {
+    const element = document.querySelector(selector)! as HTMLButtonElement;
+    element.addEventListener("click", () => {
+      const dialog = new InputDialog();
+      const input = new InputComponent();
+
+      dialog.addChild(input); // #dialog__body에 MediaSectionInput을 붙여주고 ✨
+      dialog.attachTo(this.dialogRoot); // document.body에 #dialog__body를 붙인다! ✨
 
       dialog.setOnCloseListener(() => {
-        dialog.removeFrom(dialogRoot);
+        dialog.removeFrom(this.dialogRoot);
       });
       dialog.setOnSubmitListener(() => {
-        const image = new ImageComponent(inputSection.title, inputSection.url);
+        const image = makeSection(input);
         this.page.addChild(image);
-        dialog.removeFrom(dialogRoot);
-      });
-    });
-
-    const videoBtn = document.querySelector("#new-video")! as HTMLButtonElement;
-    videoBtn.addEventListener("click", () => {
-      const dialog = new InputDialog();
-      const inputSection = new MediaSectionInput();
-
-      dialog.addChild(inputSection); // #dialog__body에 MediaSectionInput을 붙여주고 ✨
-      dialog.attachTo(dialogRoot); // document.body에 #dialog__body를 붙인다! ✨
-
-      dialog.setOnCloseListener(() => {
-        dialog.removeFrom(dialogRoot);
-      });
-      dialog.setOnSubmitListener(() => {
-        const image = new VideoComponent(inputSection.title, inputSection.url);
-        this.page.addChild(image);
-        dialog.removeFrom(dialogRoot);
-      });
-    });
-
-    const noteBtn = document.querySelector("#new-note")! as HTMLButtonElement;
-    noteBtn.addEventListener("click", () => {
-      const dialog = new InputDialog();
-      const inputSection = new TextSectionInput();
-
-      dialog.addChild(inputSection); // #dialog__body에 MediaSectionInput을 붙여주고 ✨
-      dialog.attachTo(dialogRoot); // document.body에 #dialog__body를 붙인다! ✨
-
-      dialog.setOnCloseListener(() => {
-        dialog.removeFrom(dialogRoot);
-      });
-      dialog.setOnSubmitListener(() => {
-        const image = new NoteComponent(inputSection.title, inputSection.body);
-        this.page.addChild(image);
-        dialog.removeFrom(dialogRoot);
-      });
-    });
-
-    const todoBtn = document.querySelector("#new-todo")! as HTMLButtonElement;
-    todoBtn.addEventListener("click", () => {
-      const dialog = new InputDialog();
-      const inputSection = new TextSectionInput();
-
-      dialog.addChild(inputSection); // #dialog__body에 MediaSectionInput을 붙여주고 ✨
-      dialog.attachTo(dialogRoot); // document.body에 #dialog__body를 붙인다! ✨
-
-      dialog.setOnCloseListener(() => {
-        dialog.removeFrom(dialogRoot);
-      });
-      dialog.setOnSubmitListener(() => {
-        const image = new TodoComponent(inputSection.title, inputSection.body);
-        this.page.addChild(image);
-        dialog.removeFrom(dialogRoot);
+        dialog.removeFrom(this.dialogRoot);
       });
     });
   }
