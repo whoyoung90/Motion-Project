@@ -41,7 +41,7 @@ export class PageItemComponent
 {
   private closeListener?: OnCloseListener; // 외부로부터 전달받을 콜백함수를 저장
   constructor() {
-    super(`<li class="page-item">
+    super(`<li draggable="true" class="page-item">
             <section class="page-item__body"></section>
             <div class="page-item__controls">
               <button class="close">&times;</button>
@@ -52,6 +52,20 @@ export class PageItemComponent
     closeBtn.onclick = () => {
       this.closeListener && this.closeListener(); // () => { item.removeFrom(this.element) }
     };
+
+    this.element.addEventListener("dragstart", (event: DragEvent) => {
+      this.onDragStart(event);
+    });
+    this.element.addEventListener("dragend", (event: DragEvent) => {
+      this.onDragEnd(event);
+    });
+  }
+
+  onDragStart(event: DragEvent) {
+    console.log("dragStart", event);
+  }
+  onDragEnd(event: DragEvent) {
+    console.log("dragEnd", event);
   }
 
   // child에 어떤 컴포넌트가 들어올지 모르지만(image, note, todo, video)
@@ -78,6 +92,22 @@ export class PageComponent
 {
   constructor(private pageItemConstructor: SectionContainerConstructor) {
     super(`<ul class="page"></ul>`);
+
+    this.element.addEventListener("dragover", (event: DragEvent) => {
+      this.onDragOver(event);
+    });
+    this.element.addEventListener("drop", (event: DragEvent) => {
+      this.onDrop(event);
+    });
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault(); // Define a drop zone (MDN)
+    console.log("onDragOver");
+  }
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    console.log("drop");
   }
 
   // section(image, note, todo, video)

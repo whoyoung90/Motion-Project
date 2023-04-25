@@ -2,7 +2,7 @@ import { BaseComponent } from "./../../component.js";
 export class ImageComponent extends BaseComponent<HTMLElement> {
   // 자식 생성자 title, url
   constructor(title: string, url: string) {
-    // super를 이용해서 부모 클래스의 생성자 htmlString 호출
+    // super를 이용해서 부모 클래스의 생성자 htmlString 호출 (this.element가 준비됨!)
     super(`<section class="image">
             <div class="image__holder"><img class="image__thumbnail"></div>
             <h2 class="page-item__title image__title"></h2>
