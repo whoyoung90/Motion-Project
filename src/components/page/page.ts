@@ -10,6 +10,13 @@ export interface Composable {
 
 type OnCloseListener = () => void;
 
+// 옮겨지는 컴포넌트 입장(start, stop) | 남겨진 컴포넌트 입장(enter, leave)
+type DragState = "start" | "stop" | "enter" | "leave";
+type OnDragStateListener<T extends Component> = (
+  target: T,
+  state: DragState
+) => void;
+
 /**
  * @decription new () 생성자 타입 ⭐️
  * 아무것도 전달받지 않는 생성자인데
@@ -27,6 +34,7 @@ type SectionContainerConstructor = {
  */
 interface SectionContainer extends Component, Composable {
   setOnCloseListener(listener: OnCloseListener): void;
+  setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
 }
 
 /**
@@ -40,6 +48,8 @@ export class PageItemComponent
   implements SectionContainer
 {
   private closeListener?: OnCloseListener; // 외부로부터 전달받을 콜백함수를 저장
+  private dragStateListener?: OnDragStateListener<PageItemComponent>;
+
   constructor() {
     super(`<li draggable="true" class="page-item">
             <section class="page-item__body"></section>
@@ -59,13 +69,12 @@ export class PageItemComponent
     this.element.addEventListener("dragend", (event: DragEvent) => {
       this.onDragEnd(event);
     });
-  }
-
-  onDragStart(event: DragEvent) {
-    console.log("dragStart", event);
-  }
-  onDragEnd(event: DragEvent) {
-    console.log("dragEnd", event);
+    this.element.addEventListener("dragenter", (event: DragEvent) => {
+      this.onDragEnter(event);
+    });
+    this.element.addEventListener("dragleave", (event: DragEvent) => {
+      this.onDragLeave(event);
+    });
   }
 
   // child에 어떤 컴포넌트가 들어올지 모르지만(image, note, todo, video)
@@ -75,9 +84,32 @@ export class PageItemComponent
     )! as HTMLElement;
     child.attachTo(container); // .page-item__body에 (child) element를 붙여준다!
   }
-
   setOnCloseListener(listener: OnCloseListener) {
     this.closeListener = listener;
+  }
+
+  onDragStart(event: DragEvent) {
+    this.notifyDragObservers("start");
+    console.log("dragStart (PageItemComponent)", event);
+  }
+  onDragEnd(event: DragEvent) {
+    this.notifyDragObservers("stop");
+    console.log("dragEnd (PageItemComponent)", event);
+  }
+  onDragEnter(event: DragEvent) {
+    this.notifyDragObservers("enter");
+    console.log("dragEnter (PageItemComponent)", event);
+  }
+  onDragLeave(event: DragEvent) {
+    this.notifyDragObservers("leave");
+    console.log("dragLeave (PageItemComponent)", event);
+  }
+
+  notifyDragObservers(state: DragState) {
+    this.dragStateListener && this.dragStateListener(this, state); // target은 해당 컴포넌트 자신 this
+  }
+  setOnDragStateListener(listener: OnDragStateListener<PageItemComponent>) {
+    this.dragStateListener = listener;
   }
 }
 
@@ -103,11 +135,11 @@ export class PageComponent
 
   onDragOver(event: DragEvent) {
     event.preventDefault(); // Define a drop zone (MDN)
-    console.log("onDragOver");
+    console.log("onDragOver (PageComponent)");
   }
   onDrop(event: DragEvent) {
     event.preventDefault();
-    console.log("drop");
+    console.log("drop (PageComponent)");
   }
 
   // section(image, note, todo, video)
@@ -120,6 +152,12 @@ export class PageComponent
     item.setOnCloseListener(() => {
       item.removeFrom(this.element); // PageComponent로부터 PageItem을 제거
     });
+
+    item.setOnDragStateListener(
+      (target: SectionContainer, state: DragState) => {
+        console.log(target, state);
+      }
+    );
   }
 }
 

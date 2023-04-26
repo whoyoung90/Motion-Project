@@ -108,7 +108,7 @@ class App {
     const element = document.querySelector(selector)! as HTMLButtonElement;
     element.addEventListener("click", () => {
       const dialog = new InputDialog();
-      const input = new InputComponent();
+      const input = new InputComponent(); // constructor타입으로 확장성
 
       dialog.addChild(input); // #dialog__body에 MediaSectionInput을 붙여주고 ✨
       dialog.attachTo(this.dialogRoot); // document.body에 #dialog__body를 붙인다! ✨
