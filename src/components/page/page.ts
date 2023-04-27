@@ -10,11 +10,11 @@ export interface Composable {
 
 type OnCloseListener = () => void;
 
-// 옮겨지는 컴포넌트 입장(start, stop) | 남겨진 컴포넌트 입장(enter, leave)
+// 드래깅 컴포넌트 입장(start, stop) | 남아있는 컴포넌트 입장(enter, leave)
 type DragState = "start" | "stop" | "enter" | "leave";
 type OnDragStateListener<T extends Component> = (
-  target: T,
-  state: DragState
+  target: T, // 드래깅 타깃
+  state: DragState // 드래깅 상태
 ) => void;
 
 /**
@@ -88,28 +88,24 @@ export class PageItemComponent
     this.closeListener = listener;
   }
 
-  onDragStart(event: DragEvent) {
+  onDragStart(_: DragEvent) {
     this.notifyDragObservers("start");
-    console.log("dragStart (PageItemComponent)", event);
   }
-  onDragEnd(event: DragEvent) {
+  onDragEnd(_: DragEvent) {
     this.notifyDragObservers("stop");
-    console.log("dragEnd (PageItemComponent)", event);
   }
-  onDragEnter(event: DragEvent) {
+  onDragEnter(_: DragEvent) {
     this.notifyDragObservers("enter");
-    console.log("dragEnter (PageItemComponent)", event);
   }
-  onDragLeave(event: DragEvent) {
+  onDragLeave(_: DragEvent) {
     this.notifyDragObservers("leave");
-    console.log("dragLeave (PageItemComponent)", event);
   }
 
-  notifyDragObservers(state: DragState) {
-    this.dragStateListener && this.dragStateListener(this, state); // target은 해당 컴포넌트 자신 this
-  }
   setOnDragStateListener(listener: OnDragStateListener<PageItemComponent>) {
     this.dragStateListener = listener;
+  }
+  notifyDragObservers(state: DragState) {
+    this.dragStateListener && this.dragStateListener(this, state); // target은 해당 컴포넌트 자신 this
   }
 }
 
