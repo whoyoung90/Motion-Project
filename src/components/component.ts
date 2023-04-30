@@ -4,8 +4,12 @@
  * attchTo 함수를 구현하는 다른 종류의 클래스를 만들 수 있다!
  */
 export interface Component {
+  // 자기 자신을 부모 컨테이너에 붙여줌
   attachTo(parent: HTMLElement, position?: InsertPosition): void;
   removeFrom(parent: HTMLElement): void;
+
+  // 전달받은 컴포넌트를 나 자신 안에다가 붙여줌
+  attach(component: Component, position?: InsertPosition): void;
 }
 
 /**
@@ -31,5 +35,10 @@ export class BaseComponent<T extends HTMLElement> implements Component {
       throw new Error("Parent mismatch!");
     }
     parent.removeChild(this.element);
+  }
+
+  attach(component: Component, position?: InsertPosition) {
+    // 전달받은 컴포넌트(dragTarget)를 나 자신(element) 안에다가 붙여줌
+    component.attachTo(this.element, position);
   }
 }

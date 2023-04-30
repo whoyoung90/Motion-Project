@@ -35,6 +35,7 @@ type SectionContainerConstructor = {
 interface SectionContainer extends Component, Composable {
   setOnCloseListener(listener: OnCloseListener): void;
   setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
+  muteChildren(state: "mute" | "unmute"): void;
 }
 
 /**
@@ -51,6 +52,7 @@ export class PageItemComponent
   private dragStateListener?: OnDragStateListener<PageItemComponent>;
 
   constructor() {
+    // super에서 element가 동적으로 생성
     super(`<li draggable="true" class="page-item">
             <section class="page-item__body"></section>
             <div class="page-item__controls">
@@ -107,6 +109,11 @@ export class PageItemComponent
   notifyDragObservers(state: DragState) {
     this.dragStateListener && this.dragStateListener(this, state); // target은 해당 컴포넌트 자신 this
   }
+
+  muteChildren(state: "mute" | "unmute") {
+    if (state === "mute") this.element.classList.add("mute-children");
+    else this.element.classList.remove("mute-children");
+  }
 }
 
 /**
@@ -118,6 +125,10 @@ export class PageComponent
   extends BaseComponent<HTMLUListElement>
   implements Composable
 {
+  private children = new Set<SectionContainer>();
+  private dropTarget?: SectionContainer;
+  private dragTarget?: SectionContainer;
+
   constructor(private pageItemConstructor: SectionContainerConstructor) {
     super(`<ul class="page"></ul>`);
 
@@ -136,6 +147,12 @@ export class PageComponent
   onDrop(event: DragEvent) {
     event.preventDefault();
     console.log("drop (PageComponent)");
+
+    if (!this.dropTarget) return;
+    if (this.dragTarget && this.dragTarget !== this.dropTarget) {
+      this.dragTarget.removeFrom(this.element);
+      this.dropTarget.attach(this.dragTarget, "beforebegin"); // dropTarget 이전에 추가!
+    }
   }
 
   // section(image, note, todo, video)
@@ -147,13 +164,40 @@ export class PageComponent
     item.attachTo(this.element, "beforeend"); // PageComponent에 PageItem을 붙인다! ✨
     item.setOnCloseListener(() => {
       item.removeFrom(this.element); // PageComponent로부터 PageItem을 제거
+      this.children.delete(item);
     });
+
+    this.children.add(item);
 
     item.setOnDragStateListener(
       (target: SectionContainer, state: DragState) => {
         console.log(target, state);
+        switch (state) {
+          case "start":
+            this.dragTarget = target;
+            this.updateSections("mute");
+            break;
+          case "stop":
+            this.dragTarget = undefined;
+            this.updateSections("unmute");
+            break;
+          case "enter":
+            this.dropTarget = target;
+            break;
+          case "leave":
+            this.dropTarget = undefined;
+            break;
+          default:
+            throw new Error(`unsupported state: ${state}`);
+        }
       }
     );
+  }
+
+  private updateSections(state: "mute" | "unmute") {
+    this.children.forEach((section: SectionContainer) => {
+      section.muteChildren(state);
+    });
   }
 }
 
