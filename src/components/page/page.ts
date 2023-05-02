@@ -111,7 +111,8 @@ export class PageItemComponent
   }
 
   muteChildren(state: "mute" | "unmute") {
-    if (state === "mute") this.element.classList.add("mute-children");
+    if (state === "mute")
+      this.element.classList.add("mute-children"); // pointer-events: none;
     else this.element.classList.remove("mute-children");
   }
 }
@@ -148,9 +149,10 @@ export class PageComponent
     event.preventDefault();
     console.log("drop (PageComponent)");
 
+    // 여기에서 위치 변경
     if (!this.dropTarget) return;
     if (this.dragTarget && this.dragTarget !== this.dropTarget) {
-      this.dragTarget.removeFrom(this.element);
+      this.dragTarget.removeFrom(this.element); // 드래깅한 컴포넌트를 기존 위치에서 제거하고
       this.dropTarget.attach(this.dragTarget, "beforebegin"); // dropTarget 이전에 추가!
     }
   }
@@ -178,7 +180,7 @@ export class PageComponent
             this.updateSections("mute");
             break;
           case "stop":
-            this.dragTarget = undefined;
+            this.dragTarget = undefined; // 드래깅 끝났으므로
             this.updateSections("unmute");
             break;
           case "enter":
