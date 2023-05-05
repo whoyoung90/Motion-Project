@@ -36,6 +36,8 @@ interface SectionContainer extends Component, Composable {
   setOnCloseListener(listener: OnCloseListener): void;
   setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
   muteChildren(state: "mute" | "unmute"): void;
+  getBoundingRect(): DOMRect;
+  onDropped(): void;
 }
 
 /**
@@ -62,7 +64,7 @@ export class PageItemComponent
 
     const closeBtn = this.element.querySelector(".close")! as HTMLButtonElement;
     closeBtn.onclick = () => {
-      this.closeListener && this.closeListener(); // () => { item.removeFrom(this.element) }
+      this.closeListener && this.closeListener();
     };
 
     this.element.addEventListener("dragstart", (event: DragEvent) => {
@@ -92,15 +94,22 @@ export class PageItemComponent
 
   onDragStart(_: DragEvent) {
     this.notifyDragObservers("start");
+    this.element.classList.add("lifted");
   }
   onDragEnd(_: DragEvent) {
     this.notifyDragObservers("stop");
+    this.element.classList.remove("lifted");
   }
   onDragEnter(_: DragEvent) {
     this.notifyDragObservers("enter");
+    this.element.classList.add("drop-area");
   }
   onDragLeave(_: DragEvent) {
     this.notifyDragObservers("leave");
+    this.element.classList.remove("drop-area");
+  }
+  onDropped() {
+    this.element.classList.remove("drop-area");
   }
 
   setOnDragStateListener(listener: OnDragStateListener<PageItemComponent>) {
@@ -115,6 +124,10 @@ export class PageItemComponent
       this.element.classList.add("mute-children"); // pointer-events: none;
     else this.element.classList.remove("mute-children");
   }
+
+  getBoundingRect(): DOMRect {
+    return this.element.getBoundingClientRect();
+  }
 }
 
 /**
@@ -126,7 +139,7 @@ export class PageComponent
   extends BaseComponent<HTMLUListElement>
   implements Composable
 {
-  private children = new Set<SectionContainer>();
+  private children = new Set<SectionContainer>(); // Map과 달리 Set은 중복된 데이터를 가질 수 없는 자료구조!
   private dropTarget?: SectionContainer;
   private dragTarget?: SectionContainer;
 
@@ -149,12 +162,19 @@ export class PageComponent
     event.preventDefault();
     console.log("drop (PageComponent)");
 
-    // 여기에서 위치 변경
+    /* 여기에서 위치 변경 */
     if (!this.dropTarget) return;
     if (this.dragTarget && this.dragTarget !== this.dropTarget) {
-      this.dragTarget.removeFrom(this.element); // 드래깅한 컴포넌트를 기존 위치에서 제거하고
-      this.dropTarget.attach(this.dragTarget, "beforebegin"); // dropTarget 이전에 추가!
+      const dropY = event.clientY;
+      const srcElement = this.dragTarget.getBoundingRect();
+
+      this.dragTarget.removeFrom(this.element); // dragTarget 컴포넌트를 PageComponent에서 제거하고
+      this.dropTarget.attach(
+        this.dragTarget,
+        dropY < srcElement.y ? "beforebegin" : "afterend"
+      );
     }
+    this.dropTarget.onDropped(); // drop시 leave가 발생하지 않는 이슈 해결
   }
 
   // section(image, note, todo, video)
@@ -177,11 +197,11 @@ export class PageComponent
         switch (state) {
           case "start":
             this.dragTarget = target;
-            this.updateSections("mute");
+            this.updateSections("mute"); // 드래깅이 시작되면 모든 포인터를 음소거 (pointer-events: none;)
             break;
           case "stop":
-            this.dragTarget = undefined; // 드래깅 끝났으므로
-            this.updateSections("unmute");
+            this.dragTarget = undefined;
+            this.updateSections("unmute"); // 드래깅이 끝나면 음소거 해제
             break;
           case "enter":
             this.dropTarget = target;
@@ -198,7 +218,7 @@ export class PageComponent
 
   private updateSections(state: "mute" | "unmute") {
     this.children.forEach((section: SectionContainer) => {
-      section.muteChildren(state);
+      section.muteChildren(state); // section이 가지고있는 모든 자식요소들의 포인터를 음소거
     });
   }
 }
