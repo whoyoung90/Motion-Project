@@ -109,7 +109,7 @@ export class PageItemComponent
     this.element.classList.remove("drop-area");
   }
   onDropped() {
-    this.element.classList.remove("drop-area");
+    this.element.classList.remove("drop-area"); // drop시 leave가 발생하지 않는 이슈 해결 (line 109)
   }
 
   setOnDragStateListener(listener: OnDragStateListener<PageItemComponent>) {
@@ -139,7 +139,7 @@ export class PageComponent
   extends BaseComponent<HTMLUListElement>
   implements Composable
 {
-  private children = new Set<SectionContainer>(); // Map과 달리 Set은 중복된 데이터를 가질 수 없는 자료구조!
+  private children = new Set<SectionContainer>(); // Map과 달리 Set은 중복된 데이터를 가질 수 없는 자료구조! (모든 자식 SectionContainer를 가질 수 있는 Set)
   private dropTarget?: SectionContainer;
   private dragTarget?: SectionContainer;
 
@@ -189,7 +189,7 @@ export class PageComponent
       this.children.delete(item);
     });
 
-    this.children.add(item);
+    this.children.add(item); // children은 가지고 있는 모든 자식요소들에 대해서 알고 있게 된다!
 
     item.setOnDragStateListener(
       (target: SectionContainer, state: DragState) => {
